@@ -23,10 +23,10 @@ app.get('/api/todos', (req, res) => {
     res.json(results);
   })
 });
+
 // POST /api/todos/ - post a JSON representation of a todo and have it saved. Returns the saved todo item in JSON.
 app.post('/api/todos', (req, res) => {
   let title = req.body.title;
-  console.log(title);
   let addTodo = new Todo(
     {title: title, order: 5}
   );
@@ -34,6 +34,7 @@ app.post('/api/todos', (req, res) => {
     res.redirect('/');
   });
 });
+
 // GET /api/todos[/id] - get a specific todo item.
 app.get('/api/todos/:id', (req, res) => {
   let id = req.params.id;
@@ -41,9 +42,36 @@ app.get('/api/todos/:id', (req, res) => {
     res.json(result);
   })
 });
+
 // PUT /api/todos[/id] - update a todo item. Returns the modified todo item.
+app.put('/api/todos/:id', (req, res) => {
+  let id = req.params.id;
+  let title = req.body.title;
+  Todo.findOne({_id: id}).then(result => {
+    result.title = title;
+    result.save().then(function(){
+      res.redirect('/');
+    });
+  })
+});
+
 // PATCH /api/todos[/id] - partially update a todo item. Returns the modified todo item.
+app.patch('/api/todos/:id', (req, res) => {
+  let id = req.params.id;
+  let title = req.body.title;
+  Todo.findOneAndUpdate({_id: id}, {$set: {title: title}}).then(result => {
+    res.json(result);
+  })
+});
+
 // DELETE /api/todos[/id] - deletes a todo item. Returns the todo item that was deleted.
+app.delete('/api/todos/:id', (req, res) => {
+  console.log('Hey, delete!');
+  let id = req.params.id;
+  Todo.findOneAndRemove({_id: id}).then(result => {
+    res.json(result);
+  })
+});
 
 app.listen(3000, function () {
     console.log('Express running on http://localhost:3000/.')
